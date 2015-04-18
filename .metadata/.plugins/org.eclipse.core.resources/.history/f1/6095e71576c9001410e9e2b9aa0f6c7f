@@ -1,0 +1,42 @@
+package countdown;
+
+import java.util.Arrays;
+
+public class modder {
+	public static void main(String[] args) {
+		sortByLength("src/dictionary.txt");
+	}
+	
+	public static void sortByLength(String path) {
+		FileIO reader = new FileIO();
+		String[] raw = reader.load(path);
+		for(int i = 0; i < raw.length; i++) {
+			raw[i] = raw[i].trim();
+		}
+		
+		for(int t = 0; t < raw.length - 1; t++) {
+			for(int i = 0; i < raw.length - t - 1; i++) {
+				String a = raw[i];
+				String b = raw[i + 1];
+				int s = a.length() - b.length();
+				if(s == 0)// if(t1[i+1].compareTo(t1[1+1])>0)
+				{
+					if(a.compareTo(b) > 0) {
+						String tempStr = raw[i];
+						raw[i] = raw[i + 1];
+						raw[i + 1] = tempStr;
+					}
+				} else {
+					if(s < 0) {
+						String tempStr = raw[i];
+						raw[i] = raw[i + 1];
+						raw[i + 1] = tempStr;
+					}
+				}
+			}
+		}
+		
+		System.out.println(Arrays.toString(raw));
+		reader.save("src/dictionaryByLength.txt", raw);
+	}
+}

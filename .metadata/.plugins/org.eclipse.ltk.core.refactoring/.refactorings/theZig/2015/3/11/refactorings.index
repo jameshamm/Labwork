@@ -1,0 +1,17 @@
+1425940811055	Copy file
+1425941198544	Delete element
+1426022902173	Move file
+1426022913979	Move file
+1426024032590	Rename method 'addToDictionaries'
+1426024046158	Rename method 'decodeUsingDictionary'
+1426024720616	Rename local variable 'posOfBiggest'
+1426091100374	Rename local variable 'words'
+1426200121160	Rename field 'limit'
+1426202231611	Rename field 'path'
+1426202308571	Rename field 'dictionaryWords'
+1426202334905	Rename method 'modifyDictionary'
+1426204209116	Rename local variable 'dict'
+1426245694784	Rename method 'getDictionary'
+1426247215408	Rename field 'chracterLengthLimit'
+1426247673353	Rename method 'hashCharacters'
+1426252934158	Rename local variable 'raw'

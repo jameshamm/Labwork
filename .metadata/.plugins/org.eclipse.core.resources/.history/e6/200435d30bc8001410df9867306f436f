@@ -1,0 +1,21 @@
+import java.util.*;
+import countdown.FileIO;
+
+
+public class fff {
+	public static void main(String[] args) {
+		FileIO reader = new FileIO();
+		String[] text = reader.load("src/languages/enc.txt");
+		Set<String> words = new TreeSet<>();
+		
+		for(int i = 0; i < text.length; i++) {
+			String[] temp = text[i].split(" ");
+			for(int j = 0; j < temp.length; j++) {
+				words.add(temp[j]);
+			}
+		}
+		
+		String[] save = words.toArray(new String[words.size()]);
+		reader.save("src/languages/singleWords.txt", save);
+	}
+}

@@ -1,0 +1,132 @@
+package countdown;
+
+import java.io.*;
+import java.util.*;
+
+public class DriverV2 {
+	private static boolean time = true;
+	private static boolean print = true;
+	static long start, start2, start3, end;
+
+	static String characters = "";
+	static int characterLengthLimit;
+	static int[] characterFrequencyCount = new int[256];
+
+	static String pathToDictionary = "src/dictionaryByLength.txt";
+
+	public static void main(String[] args) throws Exception {
+		takeInCharacters();
+		if(time) start = System.nanoTime();
+		countCharactersFrequency();
+		printValidWords();
+		if(time) {
+			end = System.nanoTime();
+			System.out.println("took total: " + (end - start) / 1000000 + "ms");
+		}
+	}
+
+	public static void printValidWords() throws IOException {
+		if(time) start2 = System.nanoTime();
+
+		List<String> raw = new ArrayList<>();
+		FileReader reader = new FileReader(pathToDictionary);
+		BufferedReader in = new BufferedReader(reader);
+		String line;
+
+		while(line.length() > characterLengthLimit {
+				if(hasLetters(line)) {
+					raw.add(line);
+				}
+		}
+		in.close();
+
+		if(time) System.out.println("Taking in and validating words " + (System.nanoTime() - start2) / 1000000 + "ms");
+
+		if(print) System.out.println("There are " + raw.size() + " valid words");
+
+		/* sort by length */
+		String[] valid = raw.toArray(new String[raw.size()]);
+
+		if(time) start3 = System.nanoTime();
+
+		Arrays.sort(valid, new MyComparator());
+
+		if(time) System.out.println("sorting: " + (System.nanoTime() - start3) / 1000000 + "ms");
+
+		/* print array of valid words */
+		printLongest(valid);
+		// printArray(valid);
+		// printEverything(valid);
+		System.out.println("DONE!");
+	}
+
+	public static boolean hasLetters(String dict) {
+		int[] count = Arrays.copyOf(characterFrequencyCount, characterFrequencyCount.length);
+		for(int i = 0; i < dict.length(); i++) {
+			if(count[dict.charAt(i)]-- == 0) {
+				return false; // check for negative
+			}
+		}
+		return true;
+	}
+
+	public static void printLongest(String[] array) {
+		int len = array[0].length();
+		if(print) System.out.println("Using " + characterLengthLimit + " letters, you can make: ");
+
+		int i = 0;
+		while(array[i].length() == len) {
+			System.out.println("\t" + array[i++]);
+		}
+		if(print) System.out.println("The biggest substring uses " + len + " characters");
+	}
+
+	public static void printArray(String[] array) {
+		int len = array[0].length();
+		for(int i = 0; i < array.length - 1; i++) {
+			if(array[i].length() < len) {
+				System.out.println();
+				len--;
+			}
+			System.out.print(array[i] + ", ");
+		}
+		System.out.println(array[array.length - 1]);
+	}
+
+	public static void printEverything(String[] array) {
+		int len = array.length;
+		int gap = (int) Math.sqrt(len);
+
+		for(int i = 0; i < len; i++) {
+			System.out.print(array[i] + " ");
+			if(i % gap == gap - 1) System.out.println();
+		}
+
+		// System.out.println(Arrays.toString(array));
+	}
+
+	public static void countCharactersFrequency() {
+		for(int i = 0; i < characters.length(); i++) {
+			characterFrequencyCount[characters.charAt(i)]++;
+		}
+	}
+
+	public static void takeInCharacters() {
+		Scanner scan = new Scanner(System.in);
+		while(characters.length() < 2) { // no words are less than 2 characters
+			System.out.println("Please enter a string");
+			characters = scan.nextLine().toLowerCase();
+		}
+		characterLengthLimit = characters.length();
+		scan.close();
+	}
+}
+
+/*
+ * Example decent words:
+ * aaabbbcccdddeeefffggghhhiiijjjkkklllmmmnnnooopppqqqrrrssstttuuuvvvwwwxxxyyyzzz
+ * motherfuckingpieceofshit
+ * bacterial
+ * evildread
+ * machinery
+ */

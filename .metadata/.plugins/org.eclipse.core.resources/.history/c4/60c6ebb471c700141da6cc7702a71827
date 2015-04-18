@@ -1,0 +1,195 @@
+import java.io.*;
+import java.util.*;
+import countdown.FileIO;
+
+public class Decoding {
+	static String[] newLines;
+
+	public static void main(String[] args) throws Exception {
+		FileIO reader = new FileIO();
+		newLines = getFile("src/encodedO.txt");
+
+		// print
+		// for(int i = 0; i < newLines.length; i++) {
+		// System.out.println(newLines[i]);
+		// }
+
+		// singles
+		int[] count = new int[256];
+		Set<Character> set = new HashSet<>();
+
+		for(int i = 0; i < newLines.length; i++) {
+			for(int j = 0; j < newLines[i].length(); j++) {
+				char c = newLines[i].charAt(j);
+				count[c]++;
+				set.add(c);
+			}
+		}
+
+		String[][] save = new String[set.size()][2];
+		int pos = 0;
+
+		for(int i = 0; i < count.length; i++) {
+			int temp = count[i];
+			if(temp > 0) {
+				save[pos][0] = "" + (char) i;
+				save[pos++][1] = "" + temp;
+			}
+		}
+
+		// reader.save("src/languages/soFar.txt", save);
+
+		// pairs
+		Set<String> setP = new HashSet<>();
+		int[] countP = new int[256 * 256];
+		for(int i = 0; i < newLines.length; i++) {
+			for(int j = 0; j < newLines[i].length() - 1; j++) {
+				char a = newLines[i].charAt(j);
+				char b = newLines[i].charAt(j + 1);
+				countP[a * 256 + b]++;
+				setP.add("" + a + b);
+			}
+		}
+
+		String[][] saveP = new String[setP.size()][2];
+		int posP = 0;
+		for(int i = 0; i < countP.length; i++) {
+			int temp = countP[i];
+			if(temp > 0) {
+
+				saveP[posP][0] = "'" + ((char) (i / 256)) + ((char) (i % 256)) + "'";
+				saveP[posP++][1] = "" + temp;
+			}
+		}
+		// reader.save("src/languages/soFarP.txt", saveP);
+
+		// words by length
+		String allWords = "";
+		for(int i = 0; i < newLines.length; i++) {
+			allWords += newLines[i] + "\n";
+		}
+		String[] words = allWords.split(" ");
+
+		// reader.save("src/languages/words.txt", words);
+
+		for(int t = 0; t < words.length - 1; t++) {
+			for(int i = 0; i < words.length - t - 1; i++) // for(int i = 0; i<t1.length -1; i++)
+			{
+				String a = words[i];
+				String b = words[i + 1];
+				int s = a.length() - b.length();
+				if(s == 0)// if(t1[i+1].compareTo(t1[1+1])>0)
+				{
+					if(a.compareTo(b) > 0) {
+						String tempStr = words[i];
+						words[i] = words[i + 1];
+						words[i + 1] = tempStr;
+					}
+				} else {
+					if(s > 0) {
+						String tempStr = words[i];
+						words[i] = words[i + 1];
+						words[i + 1] = tempStr;
+					}
+				}
+			}
+		}
+
+		// reader.save("src/languages/words2.txt", words);
+
+		// get all dictionaries
+
+		final File folder = new File("src/languages");
+		listFilesForFolder(folder);
+		// String[] topLetters = reader.load("src/languages/");
+
+	}
+
+	public static void listFilesForFolder(final File folder) {
+		for(final File fileEntry : folder.listFiles()) {
+			if(fileEntry.isDirectory()) {
+				listFilesForFolder(fileEntry);
+			} else {
+				if(fileEntry.getName().contains("monograms.txt")) {
+					System.out.println(fileEntry.getName());
+					decodeUsingTopLetters(fileEntry);
+				}
+
+			}
+		}
+	}
+
+	public static void decodeUsingTopLetters(File fileEntry) {
+		FileIO reader = new FileIO();
+		String[] topLetters = reader.load("src/languages/" + fileEntry.getName());
+		// System.out.println(Arrays.toString(topLetters));
+
+		String[] code = reader.load("src/encoded.txt");
+
+		Set<Character> uniqueLetters = new HashSet<>(); // track used characters
+		int[] count = new int[256]; //ascii counter
+		
+		for(int i = 0; i < code.length; i++) {
+			for(int j = 0; j < code[i].length(); j++) {
+				char c = code[i].charAt(j);
+				uniqueLetters.add(c);
+				
+				count[c]++;
+			}
+		}
+
+		//find biggest freq, presume a space
+		char biggest = '\0'; 
+		int biggestFreq = 0;
+		for(int i = 0; i < count.length; i++) {
+			if(count[i] > biggestFreq) {
+				biggest = (char)i;
+				biggestFreq = count[i];
+			}
+		}
+		count[biggest] = 0;
+		
+		for(int i = 0; i < code.length; i++) {
+			for(int j = 0; j < code[i].length(); j++) {
+				char c = code[i].charAt(j);
+				if(c == biggest) {
+					code[i] = code[i].substring(0, j)+' '+code[i].substring(j+1);
+				}
+			}
+		}
+		
+		System.out.println(Arrays.toString(code));
+
+		for(int i = 0; i < 10/* topLetters.length */; i++) {
+			String parsing = topLetters[i].split(" ")[0];
+			char c = '\0';
+			if(parsing.length() == 1) {
+				c = parsing.charAt(0);
+				char nextBiggest = '\0'; 
+				int nextBiggestFreq = 0;
+				for(int x = 0; x < count.length; x++) {
+					if(count[x] > biggestFreq) {
+						nextBiggest = (char)x;
+						nextBiggestFreq = count[x];
+					}
+				}
+				count[nextBiggest] = 0;
+				
+				
+			}
+		}
+	}
+
+	public static String[] getFile(String path) throws Exception {
+		StringBuffer contents = new StringBuffer();
+		BufferedReader reader = new BufferedReader(new FileReader(path));
+		String line = null;
+		while((line = reader.readLine()) != null) {
+			contents.append(line);
+			contents.append("\n");
+		}
+		String[] input = contents.toString().split("\n");
+		reader.close();
+		return input;
+	}
+}

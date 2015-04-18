@@ -1,0 +1,15 @@
+import java.util*;
+import java.io.File;
+import countdown.FileIO;
+
+public class characterReplacer {
+	public static void main(String[] args) {
+		final File folder = new File("src/languages");
+		
+		for(final File fileEntry : folder.listFiles()) {
+			if(fileEntry.getName().contains("monograms.txt")) {
+				System.out.println(fileEntry.getName());
+			}
+		}
+	}
+}

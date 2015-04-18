@@ -1,0 +1,112 @@
+/*	This lab implements a huffman algorithm to compress ascii strings
+ * 	It is an extension of CS211/Lab3
+ * 
+ * 	It takes in the string, records all the ascii values, and prints them to the screen in binary
+ * 	Next it counts how often each character came up, and keeps this in an array
+ * 
+ * 	Each character that is in the text at least once is added as a single Noded Tree to a Priority Queue
+ * 	Then the Trees are combined, updated, and readded to the queue
+ * 	Finally the last Tree to come out is the huffman Tree
+ * 	
+ * 	The Tree is traversed for each character, and its path recorded
+ * 	Then the difference between the orginal binary string and the huffman encoding is calculated
+ * 
+ * 	@author James Hamm 13525307
+ * 	@version 1.2 02/03/15
+ * 	@todo:
+ * 		better path finder that doesn't use recursion AND global variables
+ * 		print out only relevant information
+ * 		better Tree production, where low height Trees are combined with larger Trees so the overall Binary Tree is more balanced
+ * 		rainbows are needed
+ */
+
+import java.util.*;
+
+public class Lab4Huffman {
+	public static void main(String[] args) {
+		Scanner scan = new Scanner(System.in);
+		String s1 = scan.nextLine();
+		scan.close();
+
+		String normal = "";
+		String compressed = "";
+
+		// lab3 - get ascii values, count how many distinct characters there
+		// are,
+		// combines it all into one string, and prints them to the screen
+		int[] asciiValues = new int[s1.length()];
+		int gap = (int) Math.sqrt(s1.length() + 1);
+		Set<Integer> set = new HashSet<>();
+		for(int i = 0; i < s1.length(); i++) {
+			asciiValues[i] = (int) s1.charAt(i);
+			set.add((int) s1.charAt(i));
+
+			String temp = Integer.toBinaryString(asciiValues[i]);
+			while(temp.length() < 7)
+				temp = "0" + temp;
+
+			normal += temp;
+
+			System.out.print(String.format("%07d", Integer.parseInt(Integer.toBinaryString(asciiValues[i]))) + " ");
+			if(i % gap == gap - 1) System.out.println();
+		}
+
+		System.out.println();
+
+		// this array stores the frequency of each character
+		int[] counters = new int[256];
+
+		for(int i = 0; i < asciiValues.length; i++) {
+			counters[asciiValues[i]]++;
+		}
+
+		// part lab4 starts here
+		PriorityQueue<Tree> queue = new PriorityQueue<>();
+
+		for(int i = 0; i < counters.length; i++) {
+			if(counters[i] > 0) {
+				Node phreekey = new Node((char) i, counters[i]);
+				Tree t = new Tree(phreekey, counters[i], 1);
+				queue.add(t);
+
+				// print frequency
+				System.out.println("'" + (char) i + "' appears " + counters[i] + ((counters[i] == 1)? " time" : " times"));
+			}
+
+		}
+
+		// distinguish the forest from the trees
+		while(queue.size() > 1) {
+			Tree one = queue.poll();
+			Tree two = queue.poll();
+			Tree combined = new Tree(new Node(), one.frequency + two.frequency);
+			combined.root.leftChild = one.root;
+			combined.root.rightChild = two.root;
+			combined.frequency =;
+			combined.height = 1 + Math.max(one.height, two.height);
+			queue.add(combined);
+		}
+
+		// huffman tree after huffman algorithm
+		Tree huffAndPuff = queue.poll();
+
+		System.out.println(huffAndPuff.toString());
+
+		// print nicely
+		int gap2 = (int) Math.sqrt(asciiValues.length + 1);
+		int height = huffAndPuff.height;
+		for(int i = 0; i < asciiValues.length; i++) {
+			String temp = huffAndPuff.getPath((char) asciiValues[i]);
+			compressed += temp;
+			System.out.print(String.format("%" + height + "s", temp) + " ");
+			if(i % gap2 == gap2 - 1) System.out.println();
+		}
+
+		System.out.println();
+
+		System.out.println("len: " + normal.length() + ", normal: " + normal);
+		System.out.println("len: " + compressed.length() + ", compressed: " + compressed);
+		System.out.println("The text was compressed by " + (1.0 - (compressed.length() - normal.length())) * 100.0 / normal.length() + "%");
+	}
+
+}

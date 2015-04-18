@@ -1,0 +1,121 @@
+package countdown;
+
+import java.util.*;
+
+public class Driver {
+	private static boolean time = true;
+	static long start, end;
+
+	static String characters = "";
+	static int characterLengthLimit;
+
+	static String pathToDictionary = "src/dictionaryByLength.txt";
+	static String pathToModifiedDictionary = "src/dictionaryMod.txt";
+	static Set<String> set = new HashSet<String>();
+	static int[] characterFrequencyCount = new int[256];
+
+	public static void main(String[] args) throws Exception {
+		takeInCharacters();
+		if(time) start = System.nanoTime();
+		countCharactersFrequency();
+		printValidWords();
+		if(time) {
+			end = System.nanoTime();
+			System.out.println("took total: " + (end - start) / 1000000 + "ms");
+		}
+	}
+
+	public static void printValidWords() {
+		FileIO reader = new FileIO();
+		String[] raw = reader.load(pathToDictionary);
+
+		String[][] dict = new String[raw.length][raw[0].split("\t").length];
+
+		for(int i = 0; i < dict.length; i++) {
+			String[] raw_dict = raw[i].split("\t");
+			for(int j = 0; j < raw_dict.length; j++) {
+				dict[i][j] = raw_dict[j].trim();
+			}
+		}
+
+		List<String> validWords = new ArrayList<>();
+
+		long start2 = System.nanoTime();
+		for(int i = 0; i < dict.length; i++) {
+			if(dict[i][0].length() > characterLengthLimit) {
+				break;
+			}
+			if(hasLetters(dict[i][0])) {
+				validWords.add(dict[i][0]);
+			}
+		}
+		System.out.println("sorting takes " + (System.nanoTime() - start2) / 1000000 + "ms");
+
+		System.out.println("There are " + validWords.size() + " valid words");
+
+		// sort by length
+		String[] valid = validWords.toArray(new String[validWords.size()]);
+
+		Arrays.sort(valid, new MyComparator());
+
+		// print array of valid words
+		printArray(valid);
+
+		System.out.println("DONE!");
+	}
+
+	public static void printArray(String[] array) {
+		int len = array[0].length();
+		int count = 0;
+		for(int i = 0; i < array.length - 1; i++) {
+			if(array[i].length() < len || count++ > 10) {
+				System.out.println();
+				len--;
+				count = 0;
+			}
+			System.out.print(array[i] + ", ");
+		}
+		System.out.println(array[array.length - 1]);
+
+		// System.out.println(Arrays.toString(array));
+	}
+
+	public static boolean hasLetters(String dict) {
+		int[] count = Arrays.copyOf(characterFrequencyCount, characterFrequencyCount.length);
+		for(int i = 0; i < dict.length(); i++) {
+			if(count[dict.charAt(i)]-- == 0) {
+				return false; // check for negative
+			}
+		}
+		return true;
+	}
+
+	public static void countCharactersFrequency() {
+		for(int i = 0; i < characters.length(); i++) {
+			char c = characters.charAt(i);
+			characterFrequencyCount[c]++;
+		}
+	}
+
+	public static void takeInCharacters() {
+		Scanner scan = new Scanner(System.in);
+		while(characters.length() < 2) { // no words are less than 2 characters
+			System.out.println("Please enter a string");
+			characters = scan.nextLine().toLowerCase();
+		}
+		characterLengthLimit = characters.length();
+		scan.close();
+	}
+}
+
+class MyComparator implements Comparator<String> {
+	@Override
+	public int compare(String o1, String o2) {
+		if(o2.length() > o1.length()) {
+			return 1;
+		} else if(o2.length() < o1.length()) {
+			return -1;
+		}
+		return o1.compareTo(o2);
+	}
+}

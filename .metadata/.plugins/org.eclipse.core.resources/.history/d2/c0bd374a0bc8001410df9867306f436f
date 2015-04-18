@@ -1,0 +1,13 @@
+import countdown.FileIO;
+
+
+public class fff {
+	public static void main(String[] args) {
+		FileIO reader = new FileIO();
+		String[] text = reader.load("src/languages/enc.txt");
+		for(int i = 0; i < text.length; i++) {
+			String[] words = text[i].split(" ");
+		}
+		
+	}
+}

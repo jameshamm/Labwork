@@ -1,0 +1,11 @@
+package countdown;
+
+import java.io.*;
+
+public class FileIO {
+	public String[] load(String path) {
+		BufferedFileReader read = new BufferedFileRead();
+		
+		return new String[]{"lol", "hi"};
+	}
+}

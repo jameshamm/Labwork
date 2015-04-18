@@ -1,0 +1,22 @@
+package countdown;
+
+import java.io.*;
+
+public class FileIO {
+	public String[] load(String path) {
+		File aFile = new File(path);
+		StringBuffer contents = new StringBuffer();
+		BufferedReader input;
+		try {
+			input = new BufferedReader(new FileReader(aFile));
+			String line = null;
+			while ((line = input.readLine()) != null) {
+				contents.append(line);
+				contents.append(System.getProperty("line.separator"));
+			}
+		} catch(FileNotFoundException e)
+		 
+		
+		return new String[]{"lol", "hi"};
+	}
+}

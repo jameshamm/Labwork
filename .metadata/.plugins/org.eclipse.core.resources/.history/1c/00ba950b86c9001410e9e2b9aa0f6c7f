@@ -1,0 +1,130 @@
+package countdown;
+
+import java.io.*;
+import java.util.*;
+
+public class DriverV2 {
+	private static boolean time = true;
+	static long start, end;
+
+	static String characters = "";
+	static int characterLengthLimit;
+
+	static String pathToDictionary = "src/dictionaryByLength.txt";
+	static int[] characterFrequencyCount = new int[256];
+
+	public static void main(String[] args) throws Exception {
+		takeInCharacters();
+		if(time) start = System.nanoTime();
+		countCharactersFrequency();
+		printValidWords();
+		if(time) {
+			end = System.nanoTime();
+			System.out.println("took total: " + (end - start) / 1000000 + "ms");
+		}
+	}
+
+	public static void printValidWords() throws IOException {
+		long start2 = System.nanoTime();
+
+		List<String> raw = new ArrayList<>();
+		FileReader reader = new FileReader(pathToDictionary);
+		BufferedReader in = new BufferedReader(reader);
+		String line;
+
+		while((line = in.readLine()) != null) {
+			if(line.length() > characterLengthLimit) {
+				break;
+			} else {
+				if(hasLetters(line)) {
+					raw.add(line);
+				}
+			}
+		}
+		in.close();
+		System.out.println("taking in and validating words " + (System.nanoTime() - start2) / 1000000 + "ms");
+
+		System.out.println("There are " + raw.size() + " valid words");
+
+		/* sort by length */
+		String[] valid = raw.toArray(new String[raw.size()]);
+
+		// / long start3 = System.nanoTime();
+		Arrays.sort(valid, new MyComparator());
+		// System.out.println((System.nanoTime() - start3)/1000000+"ms");
+
+		/* print array of valid words */
+
+		printLongest(valid);
+		// printArray(valid);
+		// printEverything(valid);
+		System.out.println("DONE!");
+	}
+
+	public static void printLongest(String[] array) {
+		int len = array[0].length();
+		System.out.println("The Longest words are: ");
+		int i = 0;
+		while(array[i].length() >= len) {
+			System.out.println("\t" + array[i++]);
+		}
+	}
+
+	public static void printArray(String[] array) {
+		int len = array[0].length();
+		for(int i = 0; i < array.length - 1; i++) {
+			if(array[i].length() < len) {
+				System.out.println();
+				len--;
+			}
+			System.out.print(array[i] + ", ");
+		}
+		System.out.println(array[array.length - 1]);
+	}
+
+	public static void printEverything(String[] array) {
+		int len = array.length;
+		int gap = (int) Math.sqrt(len);
+
+		for(int i = 0; i < len; i++) {
+			System.out.print(array[i] + " ");
+			if(i % gap == gap - 1) System.out.println();
+		}
+
+		// System.out.println(Arrays.toString(array));
+	}
+
+	public static boolean hasLetters(String dict) {
+		int[] count = Arrays.copyOf(characterFrequencyCount, characterFrequencyCount.length);
+		for(int i = 0; i < dict.length(); i++) {
+			if(count[dict.charAt(i)]-- == 0) {
+				return false; // check for negative
+			}
+		}
+		return true;
+	}
+
+	public static void countCharactersFrequency() {
+		for(int i = 0; i < characters.length(); i++) {
+			characterFrequencyCount[characters.charAt(i)]++;
+		}
+	}
+
+	public static void takeInCharacters() {
+		Scanner scan = new Scanner(System.in);
+		while(characters.length() < 2) { // no words are less than 2 characters
+			System.out.println("Please enter a string");
+			characters = scan.nextLine().toLowerCase();
+		}
+		characterLengthLimit = characters.length();
+		scan.close();
+	}
+}
+
+/*
+ * Example decent words:
+ * motherfuckingpieceofshit
+ * bacterial
+ * evildread
+ * machinery
+ */

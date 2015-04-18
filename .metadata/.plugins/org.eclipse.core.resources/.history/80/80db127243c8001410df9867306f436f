@@ -1,0 +1,7 @@
+
+public class test {
+	public static void main(String[] args) {
+		int[][] array = null;
+		array[0] = new int[5];
+	}
+}

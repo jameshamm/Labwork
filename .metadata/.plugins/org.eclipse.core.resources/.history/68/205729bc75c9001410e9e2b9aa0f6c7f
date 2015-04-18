@@ -1,0 +1,12 @@
+package countdown;
+
+public class modder {
+	public static void main(String[] args) {
+		sortByLength("src/dictionary.txt");
+	}
+	
+	public static void sortByLength(String path) {
+		FileIO reader = new FileIO();
+		String raw = reader.load(path);
+	}
+}
